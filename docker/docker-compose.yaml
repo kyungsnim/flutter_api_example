@@ -1,0 +1,50 @@
+version: '3.3'
+
+services:
+  nginx:
+    image: nginx:1.19.7-alpine # 어떤 이미지를 사용할 것인지
+    container_name: nginx_container # 컨테이너명 임의로 설정
+    volumes:
+    - .:/docker # 도커의 서버에서 데이터들을 저장할 때 실제 HostOS의 어느 공간을 mount할 것인지
+    - ./etc/nginx/nginx.conf:/etc/nginx/nginx.conf # 내설정파일을 docker의 어느 부분과 맵핑할 것인지
+    - ./etc/nginx/logs:/etc/nginx/logs
+    ports:
+    - "80:80" # Host Port => Guest Port
+    - "443:443"
+    #- "8000:80" 
+    #- "8001:80" 
+  
+  php:
+    #image: php:8.0.5-fpm
+    build:
+        context: .
+        dockerfile: Dockerfile.php # 도커에서 php를 설치할 때 버전과 추가로 설치할 모듈을 설정해두는 파일 지정
+    container_name: php_container # php 컨테이너명
+    volumes:
+      - .:/docker # 현재폴더경로와 도커의 /odcker 폴더를 맵핑
+      - ./etc/php.ini:/usr/local/etc/php/php.ini # 현재폴더 하위 etc 폴더에 있는 php.ini 과 도커의 php.ini 파일 맵핑
+  
+  mariadb:
+    image: mariadb:latest
+    container_name: mariadb
+    environment:
+      - MYSQL_DATABASE=mydb # 처음 이미지 생성 후 컨테이너 실행 시 DB를 준비한다. 덮어쓰진 않음.
+      - MYSQL_USER=myuser # 사용자를 지정.
+      - MYSQL_PASSWORD=mypath12345 # 사용자 비밀번호.
+      - MYSQL_ROOT_PASSWORD=myroot12345 # 관리자 비밀번호.
+    volumes:
+      - ./var/lib/mysql:/var/lib/mysql
+    ports:
+      - "3306:3306"
+
+  phpmyadmin:
+    image: phpmyadmin
+    container_name: phpmyadmin
+    restart: always
+    ports:
+      - 33060:80
+    environment:
+      - PMA_ARBITRARY=1
+      - PMA_HOST=mariadb
+    depends_on: 
+      - mariadb
