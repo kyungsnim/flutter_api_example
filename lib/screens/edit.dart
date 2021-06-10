@@ -1,10 +1,10 @@
-import 'package:dio/dio.dart';
 import 'package:flutter/material.dart';
 
+import 'package:http/http.dart' as http;
+import 'package:http/http.dart';
 import '../env.dart';
 import '../models/student.dart';
 import '../widgets/form.dart';
-import 'home.dart';
 
 class Edit extends StatefulWidget {
   final Student student;
@@ -24,15 +24,17 @@ class _EditState extends State<Edit> {
   TextEditingController ageController;
 
   Response response;
-  var dio = Dio();
 
   // Dio post request
   Future editStudent() async {
-    return await dio.post("${Env.URL_PREFIX}/update.php", data: {
-      "id": widget.student.id.toString(),
-      "name": nameController.text,
-      "age": ageController.text
-    });
+    return await http.post(
+      "${Env.URL_PREFIX}/update.php",
+      body: {
+        "id": widget.student.id.toString(),
+        "name": nameController.text,
+        "age": ageController.text
+      },
+    );
   }
 
   void _onConfirm(context) async {

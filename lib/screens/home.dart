@@ -1,4 +1,3 @@
-import 'package:dio/dio.dart';
 import 'package:flutter/material.dart';
 import 'dart:convert';
 
@@ -10,7 +9,6 @@ import './create.dart';
 
 class Home extends StatefulWidget {
   Home({Key key}) : super(key: key);
-
   @override
   HomeState createState() => HomeState();
 }
@@ -19,39 +17,18 @@ class HomeState extends State<Home> {
   Future<List<Student>> students;
   final studentListKey = GlobalKey<HomeState>();
 
-  // Response response;
-  var dio = Dio();
-
   @override
   void initState() {
     super.initState();
     students = getStudentList();
   }
 
-  // Future<List<Student>> getStudentList() async {
-  //   final response = await http.get("${Env.URL_PREFIX}/list.php");
-  //   print(response.statusCode);
-  //   print(response.body);
-  //   final items = json.decode(response.body).cast<Map<String, dynamic>>();
-  //   List<Student> students = items.map<Student>((json) {
-  //     return Student.fromJson(json);
-  //   }).toList();
-  //
-  //   return students;
-  // }
-
   Future<List<Student>> getStudentList() async {
-    final response = await dio.get("${Env.URL_PREFIX}/list.php");
-    // response = await dio.get("${Env.URL_PREFIX}/list.php");
-    print('response data : ${response.data.toString()}');
-    print(response.statusCode);
-    print(response.data);
-    final items = json.decode(response.data).cast<Map<String, dynamic>>();
-    print(items[0]['id']);
+    final response = await http.get("${Env.URL_PREFIX}/list.php");
+    final items = json.decode(response.body).cast<Map<String, dynamic>>();
     List<Student> students = items.map<Student>((json) {
       return Student.fromJson(json);
     }).toList();
-    // print(students.length);
 
     return students;
   }
@@ -85,8 +62,7 @@ class HomeState extends State<Home> {
                     onTap: () {
                       Navigator.push(
                         context,
-                        MaterialPageRoute(
-                            builder: (context) => Details(student: data)),
+                        MaterialPageRoute(builder: (context) => Details(student: data)),
                       );
                     },
                   ),

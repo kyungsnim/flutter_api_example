@@ -11,5 +11,3 @@ $result = $stmt->fetch(PDO::FETCH_ASSOC);
 echo json_encode([
 'result' => $result
 ]);
-
-?>

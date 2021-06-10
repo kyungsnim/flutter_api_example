@@ -1,6 +1,5 @@
-import 'package:dio/dio.dart';
 import 'package:flutter/material.dart';
-
+import 'package:http/http.dart' as http;
 import '../env.dart';
 import '../widgets/form.dart';
 
@@ -14,26 +13,21 @@ class Create extends StatefulWidget {
 }
 
 class _CreateState extends State<Create> {
-  // Required for form validations
   final formKey = GlobalKey<FormState>();
 
   // Handles text onchange
   TextEditingController nameController = new TextEditingController();
   TextEditingController ageController = new TextEditingController();
 
-  Response response;
-  var dio = Dio();
-
-  // Dio post request to create new data
+  // Http post request to create new data
   Future _createStudent() async {
-    var formData = FormData.fromMap({
-      "name": nameController.text,
-      "age": ageController.text,
-    });
-
-    response = await dio.post("${Env.URL_PREFIX}/create.php", data: formData);
-    print(response.statusCode);
-    return response;
+    return await http.post(
+      "${Env.URL_PREFIX}/create.php",
+      body: {
+        "name": nameController.text,
+        "age": ageController.text,
+      },
+    );
   }
 
   void _onConfirm(context) async {
