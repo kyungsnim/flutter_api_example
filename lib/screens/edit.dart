@@ -1,7 +1,8 @@
+import 'package:dio/dio.dart';
 import 'package:flutter/material.dart';
 
-import 'package:http/http.dart' as http;
-import 'package:http/http.dart';
+// import 'package:http/http.dart' as http;
+// import 'package:http/http.dart';
 import '../env.dart';
 import '../models/student.dart';
 import '../widgets/form.dart';
@@ -25,16 +26,19 @@ class _EditState extends State<Edit> {
 
   Response response;
 
+  Dio dio = Dio();
+
   // Dio post request
   Future editStudent() async {
-    return await http.post(
-      "${Env.URL_PREFIX}/update.php",
-      body: {
+    var formData = FormData.fromMap(
+      {
         "id": widget.student.id.toString(),
         "name": nameController.text,
         "age": ageController.text
       },
     );
+
+    return await dio.post("${Env.URL_PREFIX}/update.php", data: formData);
   }
 
   void _onConfirm(context) async {

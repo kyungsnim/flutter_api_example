@@ -1,3 +1,4 @@
+import 'package:dio/dio.dart';
 import 'package:flutter/material.dart';
 
 import 'package:http/http.dart' as http;
@@ -15,13 +16,12 @@ class Details extends StatefulWidget {
 }
 
 class _DetailsState extends State<Details> {
+  Dio dio = Dio();
+
   void deleteStudent(context) async {
-    await http.post(
-      "${Env.URL_PREFIX}/delete.php",
-      body: {
-        'id': widget.student.id.toString(),
-      },
-    );
+    var formData = FormData.fromMap({'id': widget.student.id.toString()});
+
+    await dio.post("${Env.URL_PREFIX}/delete.php", data: formData);
     // Navigator.pop(context);
     Navigator.of(context)
         .pushNamedAndRemoveUntil('/', (Route<dynamic> route) => false);
@@ -79,6 +79,13 @@ class _DetailsState extends State<Details> {
             ),
             Text(
               "Age : ${widget.student.age}",
+              style: TextStyle(fontSize: 20),
+            ),
+            Padding(
+              padding: EdgeInsets.all(10),
+            ),
+            Text(
+              "Created : ${widget.student.createdAt.toString().substring(0, 10)}",
               style: TextStyle(fontSize: 20),
             ),
           ],

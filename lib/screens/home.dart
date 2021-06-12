@@ -1,3 +1,4 @@
+import 'package:dio/dio.dart';
 import 'package:flutter/material.dart';
 import 'dart:convert';
 
@@ -16,6 +17,7 @@ class Home extends StatefulWidget {
 class HomeState extends State<Home> {
   Future<List<Student>> students;
   final studentListKey = GlobalKey<HomeState>();
+  Dio dio = Dio();
 
   @override
   void initState() {
@@ -24,12 +26,48 @@ class HomeState extends State<Home> {
   }
 
   Future<List<Student>> getStudentList() async {
-    final response = await http.get("${Env.URL_PREFIX}/list.php");
-    final items = json.decode(response.body).cast<Map<String, dynamic>>();
-    List<Student> students = items.map<Student>((json) {
-      return Student.fromJson(json);
-    }).toList();
+    var responseWithHttp;
+    var responseWithDio;
 
+    // HTTP 이용하여 통신
+    try {
+      responseWithHttp = await http.get("${Env.URL_PREFIX}/list.php");
+      print(responseWithHttp.body);
+    } catch (e) {
+      print(e);
+    }
+
+    // Dio 이용하여 통신
+    try {
+      responseWithDio = await dio.get("${Env.URL_PREFIX}/list.php");
+      print(responseWithDio.data);
+    } catch (e) {
+      print(e);
+    }
+
+    try {
+      print('>>>>> Http decode : ${json.decode(responseWithHttp.body)}');
+    } catch (e) {
+      print(e);
+    }
+    // var items;
+    final items = json.decode(responseWithHttp.body).cast<Map<String, dynamic>>();
+    try {
+      // items = responseWithHttp.body;
+      // items = responseWithDio.data;
+      print(items);
+    } catch(e) {
+      print(e);
+    }
+
+    List<Student> students;
+    try {
+      students = (responseWithDio.data).map<Student>((json) {
+        return Student.fromJson(json);
+      }).toList();
+    } catch(e) {
+      print(e);
+    }
     return students;
   }
 
@@ -38,7 +76,7 @@ class HomeState extends State<Home> {
     return Scaffold(
       key: studentListKey,
       appBar: AppBar(
-        title: Text('Student List'),
+        title: Text('Dio, mysqli 이용한 CRUD'),
       ),
       body: Center(
         child: FutureBuilder<List<Student>>(
@@ -62,7 +100,8 @@ class HomeState extends State<Home> {
                     onTap: () {
                       Navigator.push(
                         context,
-                        MaterialPageRoute(builder: (context) => Details(student: data)),
+                        MaterialPageRoute(
+                            builder: (context) => Details(student: data)),
                       );
                     },
                   ),
